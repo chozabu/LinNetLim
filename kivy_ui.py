@@ -94,29 +94,30 @@ def cmp_PI(ix, iy):
 
 class MainView(GridLayout):
     def __init__(self, **kwargs):
-        kwargs['cols'] = 2
+        kwargs['cols'] = 1
         super(MainView, self).__init__(**kwargs)
 
         self.main_table = BoxLayout(orientation='vertical')
-        self.main_table.add_widget(TableHeader(height=100))
+        self.main_table.add_widget(TableHeader())
         self.main_list = GridLayout(cols=1, spacing=10, row_default_height= '30dp', row_force_default= True, size_hint_y=None)
         self.main_list.bind(minimum_height=self.main_list.setter('height'))
         self.scroll_view = ScrollView()
         self.main_table.add_widget(self.scroll_view)
         self.scroll_view.add_widget(self.main_list)
+        self.add_widget(Label(text="LinNetLim\n press apply to limit selected ports", size_hint_y=.15))
         self.add_widget(self.main_table)
 
         Clock.schedule_interval(self.update_cb, 0.5)
 
         self.connected_widgets = {}
-        self.info_panel = BoxLayout(orientation='vertical')
+        self.info_panel = BoxLayout(orientation='vertical', size_hint_x=.2)
 
-        clearbtn = Button(text='Apply')
+        clearbtn = Button(text='Apply', size_hint_y=.1)
         clearbtn.bind(on_release=self.apply_limits)
-        self.add_widget(self.info_panel)
-        self.info_panel.add_widget(Label(text="LinNetLim\n press apply to limit selected ports"))
-        self.info_panel.add_widget(clearbtn)
+        self.add_widget(clearbtn)
+        #self.info_panel.add_widget(clearbtn)
 
+    #generate a list of ports with up/down limit and pass to the packet limiter
     def apply_limits(self, obj):
         indata = []
         for r in self.main_list.children:
@@ -128,6 +129,7 @@ class MainView(GridLayout):
                 })
         packet_limiter.set_from_ports_list(indata)
 
+    #read list of ports, with raw_speed, total and speed
     def update_cb(self, dt):
         for k in list(packet_watcher.portcounts.keys()):
             v = packet_watcher.portcounts[k]
