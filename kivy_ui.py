@@ -7,6 +7,7 @@ from kivy.uix.label import Label
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.gridlayout import GridLayout
 from kivy.uix.textinput import TextInput
+from kivy.uix.scrollview import ScrollView
 from kivy.clock import Clock
 
 import simple_packet_print
@@ -97,9 +98,13 @@ class MainView(GridLayout):
         super(MainView, self).__init__(**kwargs)
 
         self.main_table = BoxLayout(orientation='vertical')
-        self.main_table.add_widget(TableHeader())
-        self.main_list = BoxLayout(orientation='vertical')
-        self.main_table.add_widget(self.main_list)
+        self.main_table.add_widget(TableHeader(height=100))
+        #self.main_list = BoxLayout(orientation='vertical')
+        self.main_list = GridLayout(cols=1, spacing=10, row_default_height= '20dp', row_force_default= True, size_hint_y=None)
+        self.main_list.bind(minimum_height=self.main_list.setter('height'))
+        self.scroll_view = ScrollView()
+        self.main_table.add_widget(self.scroll_view)
+        self.scroll_view.add_widget(self.main_list)
         self.add_widget(self.main_table)
 
         Clock.schedule_interval(self.update_cb, 0.5)
@@ -129,7 +134,7 @@ class MainView(GridLayout):
             v = simple_packet_print.portcounts[k]
             w = self.connected_widgets.get(k, None)
             if not w:
-                w = PortInfo(port=k, item=v)
+                w = PortInfo(port=k, item=v, height=100)
                 self.connected_widgets[k] = w
                 self.main_list.add_widget(w)
             w.update(v)
