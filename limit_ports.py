@@ -132,6 +132,48 @@ def set_limits():
             out, err = run(icmd)
             print "set downlimit for",k,v, out, icmd
 
+def set_from_ports_list(port_dict):
+    global traffic_classes, port_limits
+    traffic_classes = {}
+    port_limits = {}
+
+    class_lookup = {}
+
+    currentClass = 11
+    for d in port_dict:
+        ul = d['up_limit']
+        dl = d['down_limit']
+        prt = d['port']
+        new_info = {}
+
+        if ul not in class_lookup:
+            traffic_classes[currentClass] = {
+                'mark': currentClass,
+                'limit': ul
+            }
+            class_lookup[ul] = currentClass
+            new_info['up'] = currentClass
+            currentClass += 1
+        else:
+            new_info['up'] = class_lookup[ul]
+
+        if dl not in class_lookup:
+            traffic_classes[currentClass] = {
+                'mark': currentClass,
+                'limit': dl
+            }
+            class_lookup[dl] = currentClass
+            new_info['down'] = currentClass
+            currentClass += 1
+        else:
+            new_info['down'] = class_lookup[dl]
+
+        port_limits[prt] = new_info
+
+    print "PORT LIMITS", port_limits
+    print "TClasses", traffic_classes
+    reset_all()
+    set_limits()
 
 if __name__ == '__main__':
     reset_all()

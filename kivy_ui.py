@@ -4,11 +4,9 @@ from kivy.uix.widget import Widget
 from kivy.uix.button import Button
 from kivy.uix.togglebutton import ToggleButton
 from kivy.uix.label import Label
-from kivy.uix.listview import ListView
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.gridlayout import GridLayout
 from kivy.uix.textinput import TextInput
-from kivy.graphics import Color, Ellipse, Line
 from kivy.clock import Clock
 
 import simple_packet_print
@@ -147,58 +145,15 @@ class NetLimitApp(App):
 
 
     def apply_limits(self, obj):
-        print("would apply limits here")
-        traffic_classes = {}
-        port_limits = {}
-
         indata = []
-        class_lookup = {}
         for r in self.mainwidget.main_list.children:
             if r.enable_limit.state == 'down':
-                print r.port_label.text
                 indata.append({
                     "port": int(r.port_label.text),
                     "up_limit": int(r.up_limit.text),
                     "down_limit": int(r.down_limit.text)
                 })
-
-        currentClass = 11
-        for d in indata:
-            ul =  d['up_limit']
-            dl =  d['down_limit']
-            prt = d['port']
-            new_info = {}
-
-            if ul not in class_lookup:
-                traffic_classes[currentClass] = {
-                    'mark':currentClass,
-                    'limit': ul
-                }
-                class_lookup[ul] = currentClass
-                new_info['up'] = currentClass
-                currentClass += 1
-            else:
-                new_info['up'] = class_lookup[ul]
-
-            if dl not in class_lookup:
-                traffic_classes[currentClass] = {
-                    'mark':currentClass,
-                    'limit': dl
-                }
-                class_lookup[dl] = currentClass
-                new_info['down'] = currentClass
-                currentClass += 1
-            else:
-                new_info['down'] = class_lookup[dl]
-
-            port_limits[prt] = new_info
-
-        print "PORT LIMITS", port_limits
-        print "TClasses", traffic_classes
-        limit_ports.port_limits = port_limits
-        limit_ports.traffic_classes = traffic_classes
-        limit_ports.reset_all()
-        limit_ports.set_limits()
+        limit_ports.set_from_ports_list(indata)
 
 
 
