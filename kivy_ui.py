@@ -113,7 +113,8 @@ class MainView(GridLayout):
 
     def update_cb(self, dt):
         print(dt)
-        for k,v in simple_packet_print.portcounts.iteritems():
+        for k in list(simple_packet_print.portcounts.keys()):
+            v = simple_packet_print.portcounts[k]
             w = self.connected_widgets.get(k, None)
             if not w:
                 w = PortInfo(port=k,item=v)
