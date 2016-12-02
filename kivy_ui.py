@@ -1,4 +1,4 @@
-from random import random
+from threading import Thread
 from kivy.app import App
 from kivy.uix.widget import Widget
 from kivy.uix.button import Button
@@ -12,13 +12,11 @@ from kivy.clock import Clock
 import simple_packet_print
 import limit_ports
 
-
 from kivy.config import Config
+
 Config.set('graphics', 'width', '1000')
 Config.set('graphics', 'height', '1000')
 
-
-from threading import Thread
 
 class PortInfo(BoxLayout):
     def __init__(self, **kwargs):
@@ -41,11 +39,12 @@ class PortInfo(BoxLayout):
         self.add_widget(self.up_limit)
         self.add_widget(self.down_limit)
         self.add_widget(self.enable_limit)
+
     def update(self, v):
         self.net_data = v
-        self.speed_label.text = "{:.1f}".format(v['speed']/1000.0)
-        self.total_label.text = "{:.1f}".format(v['total']/1000.0)
-        self.raw_speed_label.text = "{:.1f}".format(v['speed_raw']/1000.0)
+        self.speed_label.text = "{:.1f}".format(v['speed'] / 1000.0)
+        self.total_label.text = "{:.1f}".format(v['total'] / 1000.0)
+        self.raw_speed_label.text = "{:.1f}".format(v['speed_raw'] / 1000.0)
 
 sort_key = 'speed'
 
@@ -74,10 +73,12 @@ class TableHeader(BoxLayout):
         self.add_widget(self.enable_limit_label)
 
         self.size_hint_y = 0.1
+
     def set_sort(self, obj):
         global sort_key
         sort_key = obj.sort_key
         print sort_key
+
 
 def cmp_PI(ix, iy):
     x = ix.net_data[sort_key]
@@ -91,30 +92,23 @@ def cmp_PI(ix, iy):
 
 
 class MainView(GridLayout):
-
     def __init__(self, **kwargs):
         kwargs['cols'] = 2
         super(MainView, self).__init__(**kwargs)
 
         self.main_table = BoxLayout(orientation='vertical')
         self.main_table.add_widget(TableHeader())
-
         self.main_list = BoxLayout(orientation='vertical')
-
         self.main_table.add_widget(self.main_list)
-
         self.add_widget(self.main_table)
 
         Clock.schedule_interval(self.update_cb, 0.5)
 
         self.connected_widgets = {}
-
-
         self.info_panel = BoxLayout(orientation='vertical')
 
         clearbtn = Button(text='Apply')
         clearbtn.bind(on_release=self.apply_limits)
-        #parent.add_widget(self.painter)
         self.add_widget(self.info_panel)
         self.info_panel.add_widget(Label(text="LinNetLim\n press apply to limit selected ports"))
         self.info_panel.add_widget(clearbtn)
@@ -136,37 +130,32 @@ class MainView(GridLayout):
             v = simple_packet_print.portcounts[k]
             w = self.connected_widgets.get(k, None)
             if not w:
-                w = PortInfo(port=k,item=v)
+                w = PortInfo(port=k, item=v)
                 self.connected_widgets[k] = w
                 self.main_list.add_widget(w)
             w.update(v)
         self.main_list.children.sort(cmp_PI)
 
 
-
 class NetLimitApp(App):
-
     def build(self):
         parent = MainView()
         self.start_packet_watching()
         self.mainwidget = parent
         return parent
+
     def start_packet_watching(self):
-        t=Thread(
+        t = Thread(
             target=self.launch_watcher,
             kwargs={})
-        t.daemon=True
+        t.daemon = True
         t.start()
+
     def launch_watcher(self):
         simple_packet_print.run(max_packets=None)
 
 
-
-
-
 mainapp = NetLimitApp()
-
-
 
 if __name__ == '__main__':
     mainapp.run()
