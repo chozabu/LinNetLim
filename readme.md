@@ -21,4 +21,10 @@ toggle the button next to ports you want to limit, type in an up/down limit in k
 
 To clear limits - uncheck all limits and press apply - closing the program will not stop limiting 
 
+##TODO
 
+ - group by process (perhaps with lsof?)
+ - seperate up/down data measurements
+ - tidy up
+ - system tray icon
+ - curses CLI (like iftop, nethogs)
