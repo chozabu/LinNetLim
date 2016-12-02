@@ -10,8 +10,8 @@ from kivy.uix.textinput import TextInput
 from kivy.uix.scrollview import ScrollView
 from kivy.clock import Clock
 
-import simple_packet_print
-import limit_ports
+import packet_watcher
+import packet_limiter
 
 from kivy.config import Config
 
@@ -126,11 +126,11 @@ class MainView(GridLayout):
                     "up_limit": int(r.up_limit.text),
                     "down_limit": int(r.down_limit.text)
                 })
-        limit_ports.set_from_ports_list(indata)
+        packet_limiter.set_from_ports_list(indata)
 
     def update_cb(self, dt):
-        for k in list(simple_packet_print.portcounts.keys()):
-            v = simple_packet_print.portcounts[k]
+        for k in list(packet_watcher.portcounts.keys()):
+            v = packet_watcher.portcounts[k]
             w = self.connected_widgets.get(k, None)
             if not w:
                 w = PortInfo(port=k, item=v, height=100)
@@ -143,7 +143,7 @@ class MainView(GridLayout):
 class NetLimitApp(App):
     def build(self):
         parent = MainView()
-        simple_packet_print.start_background_thread()
+        packet_watcher.start_background_thread()
         self.mainwidget = parent
         return parent
 
