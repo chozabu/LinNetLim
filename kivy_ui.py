@@ -109,6 +109,27 @@ class MainView(GridLayout):
 
         self.connected_widgets = {}
 
+
+        self.info_panel = BoxLayout(orientation='vertical')
+
+        clearbtn = Button(text='Apply')
+        clearbtn.bind(on_release=self.apply_limits)
+        #parent.add_widget(self.painter)
+        self.add_widget(self.info_panel)
+        self.info_panel.add_widget(Label(text="LinNetLim\n press apply to limit selected ports"))
+        self.info_panel.add_widget(clearbtn)
+
+    def apply_limits(self, obj):
+        indata = []
+        for r in self.main_list.children:
+            if r.enable_limit.state == 'down':
+                indata.append({
+                    "port": int(r.port_label.text),
+                    "up_limit": int(r.up_limit.text),
+                    "down_limit": int(r.down_limit.text)
+                })
+        limit_ports.set_from_ports_list(indata)
+
     def update_cb(self, dt):
         print(dt)
         for k in list(simple_packet_print.portcounts.keys()):
@@ -127,10 +148,6 @@ class NetLimitApp(App):
 
     def build(self):
         parent = MainView()
-        clearbtn = Button(text='Apply')
-        clearbtn.bind(on_release=self.apply_limits)
-        #parent.add_widget(self.painter)
-        parent.add_widget(clearbtn)
         self.start_packet_watching()
         self.mainwidget = parent
         return parent
@@ -144,16 +161,6 @@ class NetLimitApp(App):
         simple_packet_print.run(max_packets=None)
 
 
-    def apply_limits(self, obj):
-        indata = []
-        for r in self.mainwidget.main_list.children:
-            if r.enable_limit.state == 'down':
-                indata.append({
-                    "port": int(r.port_label.text),
-                    "up_limit": int(r.up_limit.text),
-                    "down_limit": int(r.down_limit.text)
-                })
-        limit_ports.set_from_ports_list(indata)
 
 
 
