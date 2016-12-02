@@ -125,7 +125,6 @@ class MainView(GridLayout):
         limit_ports.set_from_ports_list(indata)
 
     def update_cb(self, dt):
-        print(dt)
         for k in list(simple_packet_print.portcounts.keys()):
             v = simple_packet_print.portcounts[k]
             w = self.connected_widgets.get(k, None)

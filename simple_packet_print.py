@@ -71,7 +71,7 @@ class PacketCounter(sink.Sink):
                         topport = k
                         topport_speed = v['speed']
                 if topport != -1:
-                    print(topport, portcounts[topport])
+                    print("heaviest port:", topport, portcounts[topport])
 
 def run(iface_name=None, bpf=None, summary=None, max_packets=100):
     """Run the Simple Packet Printer Example"""
