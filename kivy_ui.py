@@ -1,4 +1,4 @@
-from threading import Thread
+
 from kivy.app import App
 from kivy.uix.widget import Widget
 from kivy.uix.button import Button
@@ -99,7 +99,6 @@ class MainView(GridLayout):
 
         self.main_table = BoxLayout(orientation='vertical')
         self.main_table.add_widget(TableHeader(height=100))
-        #self.main_list = BoxLayout(orientation='vertical')
         self.main_list = GridLayout(cols=1, spacing=10, row_default_height= '20dp', row_force_default= True, size_hint_y=None)
         self.main_list.bind(minimum_height=self.main_list.setter('height'))
         self.scroll_view = ScrollView()
@@ -144,19 +143,9 @@ class MainView(GridLayout):
 class NetLimitApp(App):
     def build(self):
         parent = MainView()
-        self.start_packet_watching()
+        simple_packet_print.start_background_thread()
         self.mainwidget = parent
         return parent
-
-    def start_packet_watching(self):
-        t = Thread(
-            target=self.launch_watcher,
-            kwargs={})
-        t.daemon = True
-        t.start()
-
-    def launch_watcher(self):
-        simple_packet_print.run(max_packets=None)
 
 
 mainapp = NetLimitApp()

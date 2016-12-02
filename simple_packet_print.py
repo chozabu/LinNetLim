@@ -3,6 +3,8 @@
 import os
 import argparse
 
+from threading import Thread
+
 # Local imports
 from chains.utils import signal_utils
 from chains.sources import packet_streamer
@@ -104,6 +106,17 @@ def test():
 def my_exit():
     """Exit on Signal"""
     print 'Goodbye...'
+
+
+def launch_watcher():
+    run(max_packets=None)
+
+def start_background_thread():
+    t = Thread(
+        target=launch_watcher,
+        kwargs={})
+    t.daemon = True
+    t.start()
 
 if __name__ == '__main__':
 
