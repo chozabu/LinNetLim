@@ -8,6 +8,8 @@ bash, tc and iptables are used to impose port limits
 
 Do not use if you have a custom iptables setup! This will wipe any custom rules (from the mangle table, and probably others too)
 
+![screenshot here](http://chozabu.net/autopush/2016-12-03-00-07-094395124.png)
+
 ##Running
 
 Create a python 2.7 env, install requirements and run the UI as root
