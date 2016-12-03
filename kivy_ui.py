@@ -114,7 +114,7 @@ class MainView(GridLayout):
 
         self.main_table = BoxLayout(orientation='vertical')
         self.main_table.add_widget(TableHeader())
-        self.main_list = GridLayout(cols=1, spacing=10, row_default_height= '30dp', row_force_default= True, size_hint_y=None)
+        self.main_list = GridLayout(cols=1, spacing=1, row_default_height= '30dp', row_force_default= True, size_hint_y=None)
         self.main_list.bind(minimum_height=self.main_list.setter('height'))
         self.scroll_view = ScrollView()
         self.main_table.add_widget(self.scroll_view)
