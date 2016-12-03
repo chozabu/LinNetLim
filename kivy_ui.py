@@ -9,6 +9,7 @@ from kivy.uix.gridlayout import GridLayout
 from kivy.uix.textinput import TextInput
 from kivy.uix.scrollview import ScrollView
 from kivy.clock import Clock
+from kivy.graphics import Color, Rectangle
 
 import packet_watcher
 import packet_limiter
@@ -25,7 +26,9 @@ class PortInfo(BoxLayout):
         i = kwargs['item']
         self.net_data = i
 
-        self.port_label = Label(text=str(kwargs['port']))
+        port = kwargs['port']
+
+        self.port_label = Label(text=str(port))
         self.total_label = Label()
         self.raw_speed_label = Label()
         self.speed_label = Label()
@@ -40,6 +43,18 @@ class PortInfo(BoxLayout):
         self.add_widget(self.up_limit)
         self.add_widget(self.down_limit)
         self.add_widget(self.enable_limit)
+
+        self.Blue = port & 40
+        self.Green = (port >> 8) & 40
+        self.Red = (port >> 16) & 40
+        with self.canvas.before:
+            Color(self.Red/40.0, self.Green/40.0, self.Blue/40.0, .5)  # green; colors range from 0-1 not 0-255
+            self.rect = Rectangle(size=self.size, pos=self.pos)
+        self.bind(size=self._update_rect, pos=self._update_rect)
+
+    def _update_rect(self, instance, value):
+        self.rect.pos = instance.pos
+        self.rect.size = instance.size
 
     def update(self, v):
         self.net_data = v
