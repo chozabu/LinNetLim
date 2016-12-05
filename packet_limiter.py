@@ -107,30 +107,30 @@ iptables -t mangle -A INPUT -p tcp -m tcp --sport {PORT} ! -d {LOCALNET} -j MARK
 
 def run(commands):
     process = subprocess.Popen('/bin/bash', stdin=subprocess.PIPE, stdout=subprocess.PIPE)
-    return process.communicate(commands)
+    return process.communicate(commands.encode())
 
 def reset_all():
     out, err = run(reset_net)
-    print "done\n", out
+    print("done\n", out)
 
 def set_limits():
-    for k, v in traffic_classes.iteritems():
+    for k, v in traffic_classes.items():
         ccmd = tclass.format(interface=interface, tcid=k, LIMIT=v['limit'])
         out, err = run(ccmd)
-        print "set class for",k,v, out, ccmd
+        print("set class for",k,v, out, ccmd)
         tcmd = tfilter.format(interface=interface, tcid=k, mark=v['mark'])
         out, err = run(tcmd)
-        print "set filter for",k,v, out, tcmd
+        print("set filter for",k,v, out, tcmd)
 
-    for k, v in port_limits.iteritems():
+    for k, v in port_limits.items():
         if 'up' in v:
             ocmd = markout.format(LOCALNET=LOCALNET, PORT=k, mark=v['up'])
             out, err = run(ocmd)
-            print "set uplimit for",k,v, out, ocmd
+            print("set uplimit for",k,v, out, ocmd)
         if 'down' in v:
             icmd = markin.format(LOCALNET=LOCALNET, PORT=k, mark=v['down'])
             out, err = run(icmd)
-            print "set downlimit for",k,v, out, icmd
+            print("set downlimit for",k,v, out, icmd)
 
 def set_from_ports_list(port_dict):
     global traffic_classes, port_limits
@@ -170,8 +170,8 @@ def set_from_ports_list(port_dict):
 
         port_limits[prt] = new_info
 
-    print "PORT LIMITS", port_limits
-    print "TClasses", traffic_classes
+    print("PORT LIMITS", port_limits)
+    print("TClasses", traffic_classes)
     reset_all()
     set_limits()
 
