@@ -11,8 +11,9 @@ from kivy.uix.scrollview import ScrollView
 from kivy.clock import Clock
 from kivy.graphics import Color, Rectangle
 
-import packet_watcher
+#import packet_watcher
 import packet_limiter
+import scapy_watcher as packet_watcher
 
 from kivy.config import Config
 
@@ -21,12 +22,12 @@ Config.set('graphics', 'height', '1000')
 
 
 class PortInfo(BoxLayout):
-    def __init__(self, **kwargs):
+    def __init__(self,port, item, **kwargs):
         super(PortInfo, self).__init__(**kwargs)
-        i = kwargs['item']
+        i = item#kwargs['item']
         self.net_data = i
 
-        port = kwargs['port']
+        #port = kwargs['port']
 
         self.port_label = Label(text=str(port))
         self.total_label = Label()
@@ -93,10 +94,10 @@ class TableHeader(BoxLayout):
     def set_sort(self, obj):
         global sort_key
         sort_key = obj.sort_key
-        print sort_key
+        print(sort_key)
 
 
-def cmp_PI(ix, iy):
+'''def cmp_PI(ix, iy):
     x = ix.net_data[sort_key]
     y = iy.net_data[sort_key]
     if x > y:
@@ -104,7 +105,7 @@ def cmp_PI(ix, iy):
     elif x == y:
         return 0
     else:  # x < y
-        return -1
+        return -1'''
 
 
 class MainView(GridLayout):
@@ -154,7 +155,8 @@ class MainView(GridLayout):
                 self.connected_widgets[k] = w
                 self.main_list.add_widget(w)
             w.update(v)
-        self.main_list.children.sort(cmp_PI)
+        #list(self.main_list.children).sort(key=cmp_PI)
+        super(self.main_list.children.__class__, self.main_list.children).sort(key=lambda child: child.net_data[sort_key])
 
 
 class NetLimitApp(App):
