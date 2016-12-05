@@ -12,7 +12,7 @@ Do not use if you have a custom iptables setup! This will wipe any custom rules 
 
 ##Running
 
-Create a python 2.7 env, install requirements and run the UI as root
+Create a python env, install requirements (using requirements.txt for py2 and requirements3.txt for py3) then run the UI as root
 
     virtualenv env
     . env/bin/activate
@@ -26,7 +26,7 @@ To clear limits - uncheck all limits and press apply - closing the program will 
 ##TODO
 
  - group by process (perhaps with lsof?)
- - seperate up/down data measurements
+ - separate up/down data measurements
  - tidy up
  - system tray icon
  - curses CLI (like iftop, nethogs)
