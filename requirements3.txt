@@ -1,0 +1,11 @@
+Kivy==1.9.1
+Kivy-Garden==0.1.4
+Logbook==1.0.0
+lxml==3.6.4
+Pillow==3.4.2
+py==1.4.31
+pygame==1.9.2b8
+pyshark==0.3.6.1
+requests==2.12.3
+scapy-python3==0.20
+trollius==1.0.4
