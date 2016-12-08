@@ -59,10 +59,16 @@ def launch_watcher():
     run()
 
 def start_background_thread():
-    t = Thread(
-        target=launch_watcher,
-        kwargs={})
-    t.daemon = True
+    try:
+        t = Thread(
+            daemon=True,
+            target=launch_watcher,
+            kwargs={})
+    except:
+        t = Thread(
+            target=launch_watcher,
+            kwargs={})
+        t.daemon = True
     t.start()
 
 if __name__ == '__main__':
