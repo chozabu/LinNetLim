@@ -9,8 +9,9 @@ IF="wlp3s0"
 #limit of the network interface in question
 LINKCEIL="1gbit"
 #limit outbound in/out on selected port to this rate
-LIMIT="33000kbit"
-PORT="5001"
+LIMIT="1000kbit"
+BURST="15k"
+PORT="80"
 #defines the address space for which you wish to disable rate limiting
 LOCALNET="192.168.0.0/16"
 
@@ -19,6 +20,7 @@ LOCALNET="192.168.0.0/16"
 #delete existing rules
 echo "resetting tc"
 tc qdisc del dev ${IF} root
+tc qdisc del dev ${IF} ingress
 
 #delete any existing rules
 echo "resetting iptables"
@@ -39,6 +41,22 @@ echo "setting tc"
 
 #add root class
 tc qdisc add dev ${IF} root handle 1: htb default 10
+tc qdisc add dev ${IF} handle ffff: ingress
+tc filter add dev ${IF} parent ffff: protocol ip prio 1 \
+   u32 match ip dport ${PORT} 0xffff police rate ${LIMIT} \
+   burst $BURST flowid :1
+tc filter add dev ${IF} parent ffff: protocol ip prio 1 \
+   u32 match ip sport ${PORT} 0xffff police rate ${LIMIT} \
+   burst $BURST flowid :1
+
+tc filter add dev wlp3s0 parent ffff: protocol ip prio 1 \
+    u32 match ip dport 80 0xffff police rate 5kbit \
+        burst $BURST flowid :1
+
+
+
+#tc filter add dev ${IF} parent ffff: protocol ip prio 50 u32 match ip src \
+#   0.0.0.0/0 police rate ${LIMIT} burst 20k drop flowid :1
 
 #add parent class
 tc class add dev ${IF} parent 1: classid 1:1 htb rate ${LINKCEIL} ceil ${LINKCEIL}
@@ -47,16 +65,22 @@ tc class add dev ${IF} parent 1: classid 1:1 htb rate ${LINKCEIL} ceil ${LINKCEI
 tc class add dev ${IF} parent 1:1 classid 1:10 htb rate ${LINKCEIL} ceil ${LINKCEIL} prio 0
 
 
+
 ##loop this for each rule
-tc class add dev ${IF} parent 1:1 classid 1:11 htb rate ${LIMIT} ceil ${LIMIT} prio 1
+#tc class add dev ${IF} parent 1:1 classid 1:11 htb rate ${LIMIT} ceil ${LIMIT} prio 1
+
+#tc class add dev ${IF} parent 1:1 classid 1:13 htb rate ${LIMIT} burst 15k
+tc class add dev ${IF} parent 1:1 classid 1:14 htb rate ${LIMIT} burst 15k
 
 #add handles to our classes so packets marked with <x> go into the class with "... handle <x> fw ..."
-tc filter add dev ${IF} parent 1: protocol ip prio 1 handle 1 fw classid 1:10
+#tc filter add dev ${IF} parent 1: protocol ip prio 1 handle 1 fw classid 1:10
 
 
 
 ##loop this for each rule
-tc filter add dev ${IF} parent 1: protocol ip prio 2 handle ${PORT} fw classid 1:11
+#tc filter add dev ${IF} parent 1: protocol ip prio 2 handle 6 fw classid 1:13
+#tc filter add dev ${IF} parent 1: protocol ip prio 2 handle 7 fw classid 1:13
+tc filter add dev ${IF} parent 1: protocol ip prio 2 handle 8 fw classid 1:14
 
 
 ##loop this for each rule
@@ -66,10 +90,10 @@ echo "setting iptables"
 #	--set-mark marks packages matching these criteria with the number "2"
 #	these packages are filtered by the tc filter with "handle 2"
 #	this filter sends the packages into the 1:11 class, and this class is limited to ${LIMIT}
-iptables -t mangle -A OUTPUT -p tcp -m tcp --dport ${PORT} ! -d ${LOCALNET} -j MARK --set-mark ${PORT}
-iptables -t mangle -A OUTPUT -p tcp -m tcp --sport ${PORT} ! -d ${LOCALNET} -j MARK --set-mark ${PORT}
+iptables -t mangle -A OUTPUT -p tcp -m tcp --dport ${PORT} ! -d ${LOCALNET} -j MARK --set-mark 8
+iptables -t mangle -A OUTPUT -p tcp -m tcp --sport ${PORT} ! -d ${LOCALNET} -j MARK --set-mark 8
 #limit incoming traffic
-iptables -t mangle -A INPUT -p tcp -m tcp --dport ${PORT} ! -d ${LOCALNET} -j MARK --set-mark ${PORT}
-iptables -t mangle -A INPUT -p tcp -m tcp --sport ${PORT} ! -d ${LOCALNET} -j MARK --set-mark ${PORT}
+#iptables -t mangle -A INPUT -p tcp -m tcp --dport ${PORT} -j MARK --set-mark 7
+#iptables -t mangle -A INPUT -p tcp -m tcp --sport ${PORT} -j MARK --set-mark 7
 
 
