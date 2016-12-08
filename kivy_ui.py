@@ -128,9 +128,12 @@ class MainView(GridLayout):
         self.connected_widgets = {}
         self.info_panel = BoxLayout(orientation='vertical', size_hint_x=.2)
 
-        clearbtn = Button(text='Apply', size_hint_y=.1)
-        clearbtn.bind(on_release=self.apply_limits)
-        self.add_widget(clearbtn)
+        applybtn = Button(text='Apply', size_hint_y=.1)
+        applybtn.bind(on_release=self.apply_limits)
+        self.add_widget(applybtn)
+        unapplybtn = Button(text='Un-Apply', size_hint_y=.1)
+        unapplybtn.bind(on_release=self.clear_limits)
+        self.add_widget(unapplybtn)
         #self.info_panel.add_widget(clearbtn)
 
     #generate a list of ports with up/down limit and pass to the packet limiter
@@ -144,6 +147,10 @@ class MainView(GridLayout):
                     "down_limit": int(r.down_limit.text)
                 })
         packet_limiter.set_from_ports_list(indata)
+
+
+    def clear_limits(self, obj):
+        packet_limiter.reset_all()
 
     #read list of ports, with raw_speed, total and speed
     def update_cb(self, dt):

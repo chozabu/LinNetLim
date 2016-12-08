@@ -73,8 +73,11 @@ $ipt -F OUTPUT -t mangle
 $ipt -F FORWARD -t mangle
 $ipt -t mangle -F
 $ipt -t mangle -X
+'''.format(interface=interface, ipt=ipt)
 
 
+
+basic_net = '''
 echo "setting tc"
 
 #add root class
@@ -90,7 +93,7 @@ tc class add dev {interface} parent 1:1 classid 1:10 htb rate {LINKCEIL} ceil {L
 
 #add handles to our classes so packets marked with <x> go into the class with "... handle <x> fw ..."
 tc filter add dev {interface} parent 1: protocol ip prio 1 handle 1 fw classid 1:10
-'''.format(interface=interface, LINKCEIL=LINKCEIL, ipt=ipt)
+'''.format(interface=interface, LINKCEIL=LINKCEIL)
 
 
 tclass =  "tc class add dev {interface} parent 1:1 classid 1:{tcid} htb rate {LIMIT}kbit ceil {LIMIT}kbit prio 1"
@@ -117,6 +120,11 @@ def run(commands):
 
 def reset_all():
     out, err = run(reset_net)
+    print("done\n", out)
+
+
+def set_basics():
+    out, err = run(basic_net)
     print("done\n", out)
 
 def set_limits():
@@ -182,8 +190,10 @@ def set_from_ports_list(port_dict):
     print("PORT LIMITS", port_limits)
     print("TClasses", traffic_classes)
     reset_all()
+    set_basics()
     set_limits()
 
 if __name__ == '__main__':
     reset_all()
+    set_basics()
     set_limits()
