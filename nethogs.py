@@ -66,6 +66,7 @@ class NethogsWatchdog:
 
             if (self._running == False):
                 break
+            print(line)
 
             # print line
             if (line.find(b'Refreshing') == -1):
@@ -77,7 +78,12 @@ class NethogsWatchdog:
                     continue
 
                 entry = {}
-                entry['process'] = split[0]
+                pline = split[0].decode()
+                psplit = pline.split('/')
+                entry['process'] = pline
+                entry['path'] = "/".join(psplit[:-2])
+                entry['pid'] = psplit[-2]
+                entry['filename'] = psplit[-3]
 
                 if (mode == 'transfer_rate'):
                     entry['kbps_out'] = float(split[1])
