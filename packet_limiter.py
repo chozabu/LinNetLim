@@ -80,6 +80,8 @@ echo "setting tc"
 #add root class
 tc qdisc add dev {interface} root handle 1: htb default 10
 
+tc qdisc add dev {interface} handle ffff: ingress
+
 #add parent class
 tc class add dev {interface} parent 1: classid 1:1 htb rate {LINKCEIL} ceil {LINKCEIL}
 
@@ -101,9 +103,13 @@ iptables -t mangle -A OUTPUT -p tcp -m tcp --sport {PORT} ! -d {LOCALNET} -j MAR
 '''
 
 markin = '''
-iptables -t mangle -A INPUT -p tcp -m tcp --dport {PORT} ! -d {LOCALNET} -j MARK --set-mark {mark}
-iptables -t mangle -A INPUT -p tcp -m tcp --sport {PORT} ! -d {LOCALNET} -j MARK --set-mark {mark}
-'''
+tc filter add dev {interface} parent ffff: protocol ip prio 1 \
+   u32 match ip dport {PORT} 0xffff police rate {LIMIT}kbit \
+   burst 15k flowid :1
+tc filter add dev {interface} parent ffff: protocol ip prio 1 \
+   u32 match ip sport {PORT} 0xffff police rate {LIMIT}kbit \
+   burst 15k flowid :1
+   '''
 
 def run(commands):
     process = subprocess.Popen('/bin/bash', stdin=subprocess.PIPE, stdout=subprocess.PIPE)
@@ -128,7 +134,10 @@ def set_limits():
             out, err = run(ocmd)
             print("set uplimit for",k,v, out, ocmd)
         if 'down' in v:
-            icmd = markin.format(LOCALNET=LOCALNET, PORT=k, mark=v['down'])
+            print(v)
+            icmd = markin.format(interface=interface, PORT=k,
+                                 LIMIT=traffic_classes[v['down']]['limit'])
+            print(icmd)
             out, err = run(icmd)
             print("set downlimit for",k,v, out, icmd)
 
