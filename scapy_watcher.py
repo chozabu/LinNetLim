@@ -4,6 +4,8 @@ __author__ = "Alex 'Chozabu' P-B"
 __copyright__ = "Copyright 2016, Chozabu"
 
 
+import netifaces
+
 from threading import Thread
 from scapy.all import *
 
@@ -52,7 +54,9 @@ def pkt_callback(pkt):
     calc_speeds()
 
 def run():
-    sniff(iface="wlp3s0", prn=pkt_callback, filter="tcp", store=0)
+    ifaces = [iface for iface in netifaces.interfaces()
+              if netifaces.AF_INET in netifaces.ifaddresses(iface)]
+    sniff(iface=ifaces, prn=pkt_callback, filter="tcp", store=0)
 
 
 def launch_watcher():
