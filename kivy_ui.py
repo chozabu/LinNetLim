@@ -40,6 +40,7 @@ class PortInfo(BoxLayout):
 
         self.up_limit = TextInput()
         self.down_limit = TextInput()
+        self.down_limit.disabled = True
         self.enable_limit = ToggleButton(text="limit?")
         self.add_widget(self.up_limit)
         self.add_widget(self.down_limit)

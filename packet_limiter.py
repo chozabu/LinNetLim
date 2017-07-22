@@ -141,13 +141,14 @@ def set_limits():
             ocmd = markout.format(LOCALNET=LOCALNET, PORT=k, mark=v['up'])
             out, err = run(ocmd)
             print("set uplimit for",k,v, out, ocmd)
-        if 'down' in v:
+        #disable downstream limiting until fixed
+        '''if 'down' in v:
             print(v)
             icmd = markin.format(interface=interface, PORT=k,
                                  LIMIT=traffic_classes[v['down']]['limit'])
             print(icmd)
             out, err = run(icmd)
-            print("set downlimit for",k,v, out, icmd)
+            print("set downlimit for",k,v, out, icmd)'''
 
 def set_from_ports_list(port_dict):
     global traffic_classes, port_limits
