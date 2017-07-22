@@ -142,10 +142,20 @@ class MainView(GridLayout):
         indata = []
         for r in self.main_list.children:
             if r.enable_limit.state == 'down':
+                try:
+                    ul = int(r.up_limit.text)
+                except:
+                    print("error, missing up limit, setting to 1000000")
+                    ul = 1000000
+                try:
+                    dl = int(r.down_limit.text)
+                except:
+                    print("error, missing down limit, setting to 1000000")
+                    dl = 1000000
                 indata.append({
                     "port": int(r.port_label.text),
-                    "up_limit": int(r.up_limit.text),
-                    "down_limit": int(r.down_limit.text)
+                    "up_limit": ul,
+                    "down_limit": dl
                 })
         packet_limiter.set_from_ports_list(indata)
 
