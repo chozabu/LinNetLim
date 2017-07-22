@@ -12,6 +12,10 @@ Do not use if you have a custom iptables setup! This will wipe any custom rules 
 
 ##Running
 
+first intall libpcap-dev
+
+    sudo apt install libpcap-dev
+
 Create a python env, install requirements (using requirements.txt for py2 and requirements3.txt for py3) then run the UI as root
 
     virtualenv env
