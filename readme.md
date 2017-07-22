@@ -2,6 +2,8 @@
 
 This is a program to show how which TCP ports are using data, and limit it - similar to "NetLimiter" for Windows
 
+Currently downstream limiting is disabled - if you have the time and skill to fix this, please send a PR!
+
 GUI is in Kivy  
 chains is used to read current net usage  
 bash, tc and iptables are used to impose port limits  
